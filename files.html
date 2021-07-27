@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archivos</title>
+</head>
+<body>
+    <ul>
+
+    </ul>
+
+    <button type="button" id="logout">Cerrar</button>
+
+    <script>
+        (function () {
+            'use strict'
+
+            if (localStorage.getItem('token')) {
+                console.log(localStorage.getItem('token'))
+                fetch('http://localhost:8000/api/files', {
+                    method: 'GET',
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                })
+                .then(response => {
+                    return response.json()
+                })
+                .then(resp => {
+                    console.log(resp)
+                    let li = ''
+                    resp.data.data.forEach( (file, index) => {
+                        li += '<li>' + file.name + '</li>'
+                    })
+
+                    document.querySelector('ul').innerHTML = li
+                })
+            }
+        })()
+
+        /**
+         * Logout
+         */
+        const btnLogout = document.querySelector('#logout')
+        btnLogout.onclick = async () => {
+            
+            const closeSession = await fetch('http://localhost:8000/api/logout', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            })
+            
+            const resp = await closeSession.json()
+
+            console.log(resp.message)
+            localStorage.removeItem('token')
+        }
+    </script>
+</body>
+</html>
